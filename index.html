@@ -47,12 +47,12 @@
       font-size: 14px;
       color: #dcdcdc;
     }
-    a {
-      color: #4CAF50;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
+    img {
+      max-width: 100%;
+      display: block;
+      margin: 15px auto;
+      border: 2px solid #333;
+      border-radius: 8px;
     }
     footer {
       text-align: center;
@@ -71,34 +71,20 @@
 
   <main>
     <article>
+      <h2>0. Topologi</h2>
+      <p>Berikut adalah topologi yang digunakan sebelum instalasi OS Ubuntu 22.04:</p>
+      <img src="blog/tugas fix .png" alt="Topologi Deployment">
+    </article>
+
+    <article>
       <h2>1. Operating System</h2>
-      <p>
-        Menggunakan <strong>Ubuntu 22.04 LTS (Jammy Jellyfish)</strong> sebagai basis sistem operasi.  
-        Referensi resmi: 
-        <a href="https://releases.ubuntu.com/jammy/" target="_blank">
-          https://releases.ubuntu.com/jammy/
-        </a>
-      </p>
+      <p>Menggunakan <strong>Ubuntu 22.04</strong> sebagai basis sistem operasi.  
+      Referensi: <a href="https://releases.ubuntu.com/jammy/" target="_blank">Ubuntu Jammy Release</a></p>
     </article>
 
     <article>
       <h2>2. Networking</h2>
-      <p>
-        Sebelum menjalankan <code>netplan apply</code>, tambahkan terlebih dahulu 
-        <strong>Network Adapter Host-Only</strong> pada Virtual Machine.  
-        Setelah itu atur IP statis sesuai kebutuhan (IP bebas, disesuaikan dengan jaringan).
-      </p>
-      <pre><code># Contoh konfigurasi netplan (silakan menyesuaikan)
-network:
-  version: 2
-  ethernets:
-    enp0s3:
-      dhcp4: no
-      addresses:
-        - 192.168.56.10/24
-      gateway4: 192.168.56.1
-      nameservers:
-        addresses: [8.8.8.8, 1.1.1.1]</code></pre>
+      <p>IP yang digunakan bebas, sebelum menambahkan IP pastikan menambahkan <strong>adapter network Host-Only</strong> di Virtual Machine.</p>
     </article>
 
     <article>
@@ -109,24 +95,20 @@ network:
     </article>
 
     <article>
-      <h2>4. Installasi Docker</h2>
+      <h2>4. Instalasi Docker</h2>
       <pre><code>sudo apt-get update
-sudo apt-get install ca-certificates curl -y
+sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
-| sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 sudo usermod -aG docker $USER
 sudo chmod 666 /var/run/docker.sock</code></pre>
     </article>
 
     <article>
-      <h2>5. Installasi Kubernetes (k3d)</h2>
+      <h2>5. Instalasi Kubernetes (k3d)</h2>
       <pre><code>wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 sudo apt update
 sudo apt install docker.io -y
@@ -137,7 +119,7 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin
 
-# Membuat cluster
+# Membuat cluster k3d
 sudo k3d cluster create leantime-cluster -s 1 -a 2 -p "8080:30080" -p "8081:30081"</code></pre>
     </article>
 
