@@ -84,20 +84,21 @@
     <article>
       <h2>2. Networking</h2>
       <p>
-        tambahkan terlebih dahulu 
+        Sebelum menjalankan <code>netplan apply</code>, tambahkan terlebih dahulu 
         <strong>Network Adapter Host-Only</strong> pada Virtual Machine.  
         Setelah itu atur IP statis sesuai kebutuhan (IP bebas, disesuaikan dengan jaringan).
       </p>
       <pre><code># Contoh konfigurasi netplan (silakan menyesuaikan)
 network:
-    ethernets:
-        enp0s3:
-            dhcp4: true
-        enp0s8:
-            dhcp4: false
-            addresses:
-            - 10.10.10.11/24
-    version: 2</code></pre>
+  version: 2
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses:
+        - 192.168.56.10/24
+      gateway4: 192.168.56.1
+      nameservers:
+        addresses: [8.8.8.8, 1.1.1.1]</code></pre>
     </article>
 
     <article>
@@ -241,6 +242,66 @@ spec:
   selector:
     app: leantime</code></pre>
     </article>
+
+    <article>
+      <h2>8. Deployment & Service MySQL</h2>
+      <pre><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: changeme123
+            - name: MYSQL_DATABASE
+              value: leantime
+            - name: MYSQL_USER
+              value: lean
+            - name: MYSQL_PASSWORD
+              value: changeme123
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql</code></pre>
+    </article>
   </main>
 
   <footer>
@@ -248,3 +309,5 @@ spec:
   </footer>
 </body>
 </html>
+
+
