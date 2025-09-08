@@ -84,7 +84,22 @@
 
     <article>
       <h2>2. Networking</h2>
-      <p>IP yang digunakan bebas, sebelum menambahkan IP pastikan menambahkan <strong>adapter network Host-Only</strong> di Virtual Machine.</p>
+      <p>
+        Sebelum menjalankan <code>netplan apply</code>, tambahkan terlebih dahulu 
+        <strong>Network Adapter Host-Only</strong> pada Virtual Machine.  
+        Setelah itu atur IP statis sesuai kebutuhan (IP bebas, disesuaikan dengan jaringan).
+      </p>
+      <pre><code># Contoh konfigurasi netplan (silakan menyesuaikan)
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses:
+        - 192.168.56.10/24
+      gateway4: 192.168.56.1
+      nameservers:
+        addresses: [8.8.8.8, 1.1.1.1]</code></pre>
     </article>
 
     <article>
